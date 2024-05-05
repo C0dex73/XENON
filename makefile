@@ -8,7 +8,7 @@ all: ./bin/assembler
 ./bin/assembler: ./bin/assembler.o
 	g++ -o ./bin/assembler ./bin/assembler.o -W
 
-./bin/assembler.o: ./src/assembler.cpp
+./bin/assembler.o: ./src/assembler.cpp ./src/paths.h
 	g++ -o ./bin/assembler.o -c ./src/assembler.cpp -W
 
 .PHONY: clean mrproper
@@ -16,7 +16,7 @@ all: ./bin/assembler
 clean:
 	rm -rf bin/*.o
 
-mrproper: clean
+reset: clean
 	rm -rf bin/*
 
 run:
