@@ -12,10 +12,6 @@ SOURCE_FILES=$(RAW_SRC_FILES_PATH:$(SRC_DIR)/%=%)
 SRC=$(foreach file, $(SOURCE_FILES), $(SRC_DIR)/$(file))
 OBJ=$(foreach file, $(SOURCE_FILES), $(BIN_DIR)/$(file:.cpp=.o))
 
-#^EXPLICIT DEPENDENCIES
-
-path_handler.o=string_processing.cpp
-
 #~run command arguments parsing into RUN_ARGS
 ifeq (run,$(firstword $(MAKECMDGOALS)))
   RUN_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
@@ -24,7 +20,7 @@ endif
 
 #~MAKEFILE
 
-all: $(BIN_DIR)/$(EXEC) | $(BIN_DIR)_dir
+all: $(BIN_DIR)_dir $(BIN_DIR)/$(EXEC)
 
 $(BIN_DIR)/$(EXEC): $(OBJ)
 	$(CPP) $(CPPFLAGS) -o $@ $^ $(O2EXEFLAGS)
@@ -64,11 +60,11 @@ run: $(BUILD_DIR)/$(EXEC) | build
 #~DIRECTORIES
 
 $(BUILD_DIR)_dir:
-	mkdir $(BUILD_DIR)
+	mkdir $(BUILD_DIR) -p
 
 $(BIN_DIR)_dir :
-	mkdir $(BIN_DIR)
+	mkdir $(BIN_DIR) -p
 
 #~DEBUG
 debug:
-	@echo $(SOURCE_FILES)
+	@echo There is no debug script written in $(CURDIR)/makefile
