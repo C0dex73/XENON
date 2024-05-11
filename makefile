@@ -1,23 +1,74 @@
+#~constants
+SRC_DIR=./src
+BIN_DIR=./bin
+BUILD_DIR=./build
+EXEC=assembler.exe
+CPP=g++
+CPPFLAGS=-std=c++17
+C2OFLAGS=-W
+O2EXEFLAGS=
+RAW_SRC_FILES_PATH=$(wildcard $(SRC_DIR)/*.cpp)
+SOURCE_FILES=$(RAW_SRC_FILES_PATH:$(SRC_DIR)/%=%)
+SRC=$(foreach file, $(SOURCE_FILES), $(SRC_DIR)/$(file))
+OBJ=$(foreach file, $(SOURCE_FILES), $(BIN_DIR)/$(file:.cpp=.o))
+
+#^EXPLICIT DEPENDENCIES
+
+path_handler.o=string_processing.cpp
+
+#~run command arguments parsing into RUN_ARGS
 ifeq (run,$(firstword $(MAKECMDGOALS)))
   RUN_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
   $(eval $(RUN_ARGS):;@:)
 endif
 
-all: ./bin/assembler
+#~MAKEFILE
 
-./bin/assembler: ./bin/assembler.o
-	g++ -o ./bin/assembler ./bin/assembler.o -W
+all: $(BIN_DIR)/$(EXEC) | $(BIN_DIR)_dir
 
-./bin/assembler.o: ./src/assembler.cpp ./src/paths.h
-	g++ -o ./bin/assembler.o -c ./src/assembler.cpp -W
+$(BIN_DIR)/$(EXEC): $(OBJ)
+	$(CPP) $(CPPFLAGS) -o $@ $^ $(O2EXEFLAGS)
 
-.PHONY: clean mrproper
+$(BIN_DIR)/%.o: $(SRC_DIR)/%.cpp $(SRC_DIR)/%.h
+	$(CPP) $(CPPFLAGS) -c -o $@ $< $($@) $(C2OFLAGS)
+
+$(BIN_DIR)/%.o: $(SRC_DIR)/%.cpp
+	$(CPP) $(CPPFLAGS) -c -o $@ $< $(C2OFLAGS)
+
+#~UTILS
+
+.PHONY: clean reset build fullauto rbin rbuild run
 
 clean:
-	rm -rf bin/*.o
+	rm -rf $(BIN_DIR)/*.o
 
-reset: clean
-	rm -rf bin/*
+reset:
+	rm -rf $(BIN_DIR)
+	rm -rf $(BUILD_DIR)
 
-run:
-	./bin/assembler $(RUN_ARGS)
+build: all $(BUILD_DIR)_dir
+	cp $(BIN_DIR)/*.exe $(BUILD_DIR)
+
+fullauto: build
+	$(BUILD_DIR)/$(EXEC) $(RUN_ARGS)
+
+rbin:
+	rm -rf $(BIN_DIR)
+
+rbuild:
+	rm -rf $(BUILD_DIR)
+
+run: $(BUILD_DIR)/$(EXEC) | build
+	$(BUILD_DIR)/$(EXEC) $(RUN_ARGS)
+
+#~DIRECTORIES
+
+$(BUILD_DIR)_dir:
+	mkdir $(BUILD_DIR)
+
+$(BIN_DIR)_dir :
+	mkdir $(BIN_DIR)
+
+#~DEBUG
+debug:
+	@echo $(SOURCE_FILES)
