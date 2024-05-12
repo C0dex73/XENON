@@ -2,8 +2,10 @@
 #define XENON_PATH_HANDLER
 
 #include <string>
-#include <iostream>
 #include <vector>
+#include <sstream>
+#include "string_processing.h"
+#include "process_result.h"
 
 class PathHandler {
     private :

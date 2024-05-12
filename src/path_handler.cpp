@@ -1,25 +1,30 @@
 #include <string>
-#include <iostream>
 #include <vector>
+#include <sstream>
 #include "path_handler.h"
 #include "string_processing.h"
+#include "process_result.h"
 
 std::string PathHandler::format(std::string adr, std::string ext){
-    if(adr.length() < ext.length() || (adr.length() == ext.length() && adr != ext) || adr.substr(adr.length()-ext.length()-1) != ext){
-        adr.append(ext);
-    }
-    return adr;
+    std::stringstream adr_;
+    adr_ << adr << ext;
+    return adr_.str();
 }
 
 PathHandler::PathHandler(std::vector<std::string> argv){
     if(argv.size() == 1){
-        if(utils::endsWith(argv[0], std::string(".xnn"))){
-            argv[0].erase(argv[0].length()-4);
+        utils::ProcessResult<std::string> result = utils::safeSuffixRemove(argv[0], ".xnn");
+        if(result.SEC != 0){
+            result = utils::safeSuffixRemove(argv[0], ".xas");
         }
-        argv.push_back(argv[0]);
+        argv.insert(argv.end(), {result.res, result.res});
+        argv.erase(argv.begin());
+    }else{
+        argv[0] = utils::safeSuffixRemove(argv[0], ".xnn").res;
+        argv[1] = utils::safeSuffixRemove(argv[1], ".xas").res;
     }
     this->xnn = format(argv[0], std::string(".xnn"));
-    this->schematic = format(argv[1], std::string(".schematic"));
+    this->schematic = format(argv[1], std::string(".xas"));
 }
 
 std::string PathHandler::getXnn(){
