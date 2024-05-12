@@ -13,7 +13,7 @@ SRC=$(foreach file, $(SOURCE_FILES), $(SRC_DIR)/$(file))
 OBJ=$(foreach file, $(SOURCE_FILES), $(BIN_DIR)/$(file:.cpp=.o))
 
 #~run command arguments parsing into RUN_ARGS
-ifeq (run,$(firstword $(MAKECMDGOALS)))
+ifneq (,$(filter $(firstword $(MAKECMDGOALS)), run fullauto))
   RUN_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
   $(eval $(RUN_ARGS):;@:)
 endif
